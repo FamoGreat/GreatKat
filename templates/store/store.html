@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- SECTION PAGETOP -->
+<section class="section-pagetop bg">
+  <div class="container">
+    <h2 class="title-page">Our Store</h2>
+  </div>
+</section>
+
+<!-- SECTION CONTENT -->
+<section class="section-content padding-y">
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar -->
+      <aside class="col-md-3">
+        <div class="card">
+          <!-- Categories -->
+          <article class="filter-group">
+            <header class="card-header">
+              <a href="#" data-toggle="collapse" data-target="#collapse_1" aria-expanded="true">
+                <i class="icon-control fa fa-chevron-down"></i>
+                <h6 class="title">Categories</h6>
+              </a>
+            </header>
+            <div class="filter-content collapse show" id="collapse_1">
+              <div class="card-body">
+                <ul class="list-menu">
+                  <li><a href="{% url 'store' %}">All Product</a></li>
+                  {% for category in categories %}
+                    <li><a href="{% url 'products_by_category' category.slug %}">{{ category.category_name }}</a></li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <!-- Sizes -->
+          <article class="filter-group">
+            <header class="card-header">
+              <a href="#" data-toggle="collapse" data-target="#collapse_4" aria-expanded="true">
+                <i class="icon-control fa fa-chevron-down"></i>
+                <h6 class="title">Sizes</h6>
+              </a>
+            </header>
+            <div class="filter-content collapse show" id="collapse_4">
+              <div class="card-body">
+                {% for size in sizes %}
+                  <label class="checkbox-btn">
+                    <input type="checkbox">
+                    <span class="btn btn-light">{{ size }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          </article>
+
+          <!-- Price Range -->
+          <article class="filter-group">
+            <header class="card-header">
+              <a href="#" data-toggle="collapse" data-target="#collapse_3" aria-expanded="true">
+                <i class="icon-control fa fa-chevron-down"></i>
+                <h6 class="title">Price range</h6>
+              </a>
+            </header>
+            <div class="filter-content collapse show" id="collapse_3">
+              <div class="card-body">
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label>Min</label>
+                    <select class="form-control">
+                      {% for price in price_ranges %}
+                        <option value="{{ price }}">${{ price }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Max</label>
+                    <select class="form-control">
+                      {% for price in price_options %}
+                        <option value="{{ price }}">${{ price }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <button class="btn btn-block btn-primary">Apply</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </aside>
+
+      <!-- Product Listing -->
+      <main class="col-md-9">
+        <header class="border-bottom mb-4 pb-3">
+          <div class="form-inline">
+            <span class="mr-md-auto">{{ product_count }} Items found</span>
+          </div>
+        </header>
+
+        <div class="row">
+          {% for product in products %}
+            <div class="col-md-4">
+              <figure class="card card-product-grid">
+                <div class="img-wrap">
+					<a href="{% url 'product_detail' category_slug=product.category.slug product_slug=product.slug %}" class="title">
+						<img src="{{ product.images.url }}" alt="{{ product.product_name }}">
+					</a>
+                </div>
+                <figcaption class="info-wrap">
+                  <div class="fix-height">
+                    <a href="{% url 'product_detail' category_slug=product.category.slug product_slug=product.slug %}" class="title">
+                      {{ product.product_name }}
+                    </a>
+                    <div class="price-wrap mt-2">
+                      <span class="price">${{ product.price }}</span>
+                    </div>
+                  </div>
+                  {% if product.stock > 0 %}
+                  <a href="{% url 'add_to_cart' product.id %}" class="btn btn-block btn-primary">Add to cart</a>
+                {% else %}
+                  <button class="btn btn-block btn-secondary" disabled>Out of Stock</button>
+                {% endif %}
+                </figcaption>
+              </figure>
+            </div>
+          {% endfor %}
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
