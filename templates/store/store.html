@@ -2,11 +2,24 @@
 
 {% block content %}
 <!-- SECTION PAGETOP -->
+
+{% if 'search' in request.path %}
 <section class="section-pagetop bg">
   <div class="container">
-    <h2 class="title-page">Our Store</h2>
+    <h2 class="title-page">Search Results for "{{ keyword }}"</h2>
   </div>
 </section>
+{% else %}
+<section class="section-pagetop bg">
+  <div class="container">
+    <h2 class="title-page">Store</h2>
+  </div>
+</section>
+{% endif %}
+
+{% if 'category' in request.path %}
+{% endif %}
+
 
 <!-- SECTION CONTENT -->
 <section class="section-content padding-y">
@@ -103,9 +116,9 @@
             <div class="col-md-4">
               <figure class="card card-product-grid">
                 <div class="img-wrap">
-					<a href="{% url 'product_detail' category_slug=product.category.slug product_slug=product.slug %}" class="title">
-						<img src="{{ product.images.url }}" alt="{{ product.product_name }}">
-					</a>
+                  <a href="{% url 'product_detail' category_slug=product.category.slug product_slug=product.slug %}" class="title">
+                    <img src="{{ product.images.url }}" alt="{{ product.product_name }}">
+                  </a>
                 </div>
                 <figcaption class="info-wrap">
                   <div class="fix-height">
@@ -117,15 +130,60 @@
                     </div>
                   </div>
                   {% if product.stock > 0 %}
-                  <a href="{% url 'add_to_cart' product.id %}" class="btn btn-block btn-primary">Add to cart</a>
-                {% else %}
-                  <button class="btn btn-block btn-secondary" disabled>Out of Stock</button>
-                {% endif %}
+                    {% if in_cart %}
+                      <button class="btn btn-success" disabled>Added to the cart</button>
+                    {% else %}
+                      <a href="{% url 'add_to_cart' product.id %}" class="btn btn-block btn-primary">Add to cart</a>
+                    {% endif %}
+                  {% else %}
+                    <button class="btn btn-block btn-secondary" disabled>Out of Stock</button>
+                  {% endif %}
                 </figcaption>
               </figure>
             </div>
+          {% empty %}
+              <h2 class="title-page">No result found. Please try again later</h2>
           {% endfor %}
         </div>
+        
+
+        <nav class="mt-4" aria-label="Page navigation sample">
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">Previous</span>
+              </li>
+            {% endif %}
+        
+            {% for page_num in page_obj.paginator.page_range %}
+              {% if page_num == page_obj.number %}
+                <li class="page-item active">
+                  <span class="page-link">{{ page_num }}</span>
+                </li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+        
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">Next</span>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+        
+
       </main>
     </div>
   </div>
