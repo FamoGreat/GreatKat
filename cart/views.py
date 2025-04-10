@@ -121,6 +121,10 @@ def cart(request, total=0, quantity=0, cart_items=None):
     except Cart.DoesNotExist:
         cart_items = []
         total = 0
+        quantity = 0
+        tax = 0
+        grand_total = 0
+    
     context = {
         'cart_items': cart_items,
         'total': total,

@@ -58,3 +58,6 @@ $(document).ready(function() {
 }); 
 // jquery end
 
+setTimeout(function () {
+    $('.auto-dismiss').alert('close');
+  }, 4000); // 4 seconds

@@ -47,46 +47,17 @@ class RegistrationForm(forms.ModelForm):
         if password and confirm_password and password != confirm_password:
             self.add_error('confirm_password', 'Passwords do not match')
 
+class LoginForm(forms.Form):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'Email Address'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
 
-class LoginForm(forms.ModelForm):
-    class Meta:
-        model = Account
-        fields = ['email', 'password']
-        widgets = {
-            'password': forms.PasswordInput(),
-        }
-        labels = {
-            'email': 'Email Address',
-            'password': 'Password',
-        }
-
-    # Custom validation to check if the email exists in the system
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if not email:
-            raise forms.ValidationError('Email is required.')
-        try:
-            user = Account.objects.get(email=email)
-        except Account.DoesNotExist:
-            raise forms.ValidationError('No account found with this email address.')
-        return email
-
-    # Custom validation for password
-    def clean_password(self):
-        password = self.cleaned_data.get('password')
-        if not password:
-            raise forms.ValidationError('Password is required.')
-        return password
-
-    # This method can be used to add further login validation, for example, checking if the password matches the one in the system
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get('email')
         password = cleaned_data.get('password')
 
-        # Authenticate the user
         if email and password:
             user = authenticate(username=email, password=password)
             if user is None:
-                raise forms.ValidationError('Invalid email or password.')
+                raise forms.ValidationError("Invalid email or password.")
         return cleaned_data

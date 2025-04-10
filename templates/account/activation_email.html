@@ -1,0 +1,54 @@
+{% comment %} {% autoescape off %}
+    Hi {{ user.first_name }},
+
+    Thank you for registering. Please click the button below to activate your account:
+    http//:{{domain}}{% url "activate" uidb64=uid token=token %} 
+
+    <a href="http//:{{domain}} {% url "activate" uidb64=uid token=token %}">Activate your account</a>
+
+    If you did not sign up for this account, no action is needed — you can safely ignore this email.
+
+    Best regards,  
+    The {{ domain }} Team
+    
+{% endautoescape %} {% endcomment %}
+
+
+
+{% autoescape off %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Activate Your Account</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; color: #333;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+        <h2 style="color: #1a73e8;">Welcome, {{ user.first_name }}!</h2>
+
+        <p>Thank you for registering with us.</p>
+
+        <p>To activate your account, please click the button below:</p>
+
+        <p style="text-align: center;">
+            <a href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}" 
+               style="display: inline-block; padding: 12px 24px; background-color: #1a73e8; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;">
+               Activate Your Account
+            </a>
+        </p>
+
+        <p style="text-align: center; font-size: 14px; color: #777;">
+            Or copy and paste this link into your browser:<br>
+            <a href="https://{{ domain }}{% url 'activate' uidb64=uid token=token %}" style="color: #1a73e8;">
+                http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+            </a>
+        </p>
+
+
+        <p>If you did not create this account, you can safely ignore this email.</p>
+
+        <p>Best regards,<br>The {{ domain }} Team</p>
+    </div>
+</body>
+</html>
+{% endautoescape %}
