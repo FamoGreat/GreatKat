@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="row p-5">
+  <main class="col-md-8">
+    <!-- Review Cart -->
+    <article class="card mb-4">
+      <div class="card-body">
+        <h4 class="card-title mb-4">Review cart</h4>
+        <div class="row">
+          {% for item in cart_items %}
+          <div class="col-md-6">
+            <figure class="itemside mb-4">
+              <div class="aside">
+                <img src="{{ item.product.images.url }}" class="border img-sm" />
+              </div>
+              <figcaption class="info">
+                <p>{{ item.product.product_name }}</p>
+                <span class="text-muted">
+                  {{ item.quantity }}x = {{ item.product.price|floatformat:2 }}
+                  {{ item.product.price_currency|default:"USD" }}
+                </span>
+              </figcaption>
+            </figure>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </article>
+
+    <!-- Contact + Delivery Info -->
+    <article class="card mb-4">
+      <div class="card-body">
+        <h4 class="card-title mb-4">Contact & Delivery Info</h4>
+        <form method="POST" action="{% url 'place_order' %}">
+          {% csrf_token %}
+          <div class="row">
+            <div class="form-group col-sm-6">
+              {{ form.first_name.label_tag }}
+              {{ form.first_name }}
+              {% for error in form.first_name.errors %}
+              <small class="text-danger d-block">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="form-group col-sm-6">
+              {{ form.last_name.label_tag }}
+              {{ form.last_name }}
+              {% for error in form.last_name.errors %}
+              <small class="text-danger d-block">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="form-group col-sm-6">
+              {{ form.phone.label_tag }}
+              {{ form.phone }}
+              {% for error in form.phone.errors %}
+              <small class="text-danger d-block">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="form-group col-sm-6">
+              {{ form.email.label_tag }}
+              {{ form.email }}
+              {% for error in form.email.errors %}
+              <small class="text-danger d-block">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="form-group col-sm-6">
+              {{ form.country.label_tag }}
+              {{ form.country }}
+              {% for error in form.country.errors %}
+              <small class="text-danger d-block">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="form-group col-sm-6">
+              {{ form.state.label_tag }}
+              {{ form.state }}
+              {% for error in form.state.errors %}
+              <small class="text-danger d-block">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="form-group col-sm-6">
+              {{ form.city.label_tag }}
+              {{ form.city }}
+              {% for error in form.city.errors %}
+              <small class="text-danger d-block">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="form-group col-sm-12">
+              {{ form.address_line_1.label_tag }}
+              {{ form.address_line_1 }}
+              {% for error in form.address_line_1.errors %}
+              <small class="text-danger d-block">{{ error }}</small>
+              {% endfor %}
+            </div>
+
+            <div class="form-group col-sm-12">
+              {{ form.address_line_2.label_tag }}
+              {{ form.address_line_2 }}
+            </div>
+
+            <div class="form-group col-sm-12">
+              {{ form.order_note.label_tag }}
+              {{ form.order_note }}
+            </div>
+          </div>
+
+          <!-- Payment Options -->
+          <article class="accordion" id="accordion_pay">
+            <div class="card">
+              <header class="card-header">
+                <img src="{% static 'images/misc/payment-paypal.png' %}" class="float-right" height="24" />
+                <label class="form-check collapsed" data-toggle="collapse" data-target="#pay_paynet">
+                  <input class="form-check-input" name="payment-option" checked type="radio" value="paypal" />
+                  <h6 class="form-check-label">Paypal</h6>
+                </label>
+              </header>
+              <div id="pay_paynet" class="collapse show" data-parent="#accordion_pay">
+                <div class="card-body">
+                  <p class="text-center text-muted">
+                    Connect your PayPal account and use it to pay your bills. You'll be redirected to PayPal.
+                  </p>
+                  <p class="text-center">
+                    <a href="{% url "mock_payment" %}"><img src="{% static 'images/misc/btn-paypal.png' %}" height="32" /></a>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {% comment %} <div class="card">
+              <header class="card-header">
+                <img src="{% static 'images/misc/payment-card.png' %}" class="float-right" height="24" />
+                <label class="form-check" data-toggle="collapse" data-target="#pay_payme">
+                  <input class="form-check-input" name="payment-option" type="radio" value="credit_card" />
+                  <h6 class="form-check-label">Credit Card</h6>
+                </label>
+              </header>
+              <div id="pay_payme" class="collapse" data-parent="#accordion_pay">
+                <div class="card-body">
+                  <p class="alert alert-success">Enter your card information securely.</p>
+                  <form class="form-inline">
+                    <input type="text" class="form-control mr-2" placeholder="xxxx-xxxx-xxxx-xxxx" />
+                    <input type="text" class="form-control mr-2" style="width: 100px" placeholder="mm/yy" />
+                    <input type="text" class="form-control mr-2" style="width: 100px" placeholder="cvc" />
+                    <button class="btn btn-success">Pay</button>
+                  </form>
+                </div>
+              </div>
+            </div> {% endcomment %}
+          </article>
+
+          <!-- Submit -->
+          <button type="submit" class="btn btn-primary btn-block mt-4">Place Order</button>
+        </form>
+      </div>
+    </article>
+  </main>
+
+  <!-- Order Summary -->
+  <aside class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <dl class="dlist-align">
+          <dt>Total price:</dt>
+          <dd class="text-right">${{ total|floatformat:2 }}</dd>
+        </dl>
+        <dl class="dlist-align">
+          <dt>Tax:</dt>
+          <dd class="text-right">${{ tax|floatformat:2 }}</dd>
+        </dl>
+        <dl class="dlist-align">
+          <dt>Grand Total:</dt>
+          <dd class="text-right text-dark b">
+            <strong>${{ grand_total|floatformat:2 }}</strong>
+          </dd>
+        </dl>
+        <hr />
+        <p class="text-center mb-3">
+          <img src="{% static 'images/misc/payments.png' %}" height="26" />
+        </p>
+      </div>
+    </div>
+  </aside>
+</div>
+{% endblock %}

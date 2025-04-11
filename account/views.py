@@ -10,8 +10,9 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.tokens import default_token_generator
-
 from account.models import Account
+from cart.models import Cart, CartItem
+from cart.views import _cart_id
 
 
 # Create your views here.
@@ -69,23 +70,48 @@ def login(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-
-            # Authenticate the user with the email (since email is the username)
             user = authenticate(request, username=email, password=password)
 
             if user is not None:
-                auth_login(request, user)  # Log the user in
-                return redirect('home')  # Redirect to the home page after successful login
-            else:
-                form.add_error(None, 'Invalid email or password')  # Add error if authentication fails
+                try:
+                    session_cart = Cart.objects.get(cart_id=_cart_id(request))
+                    session_items = CartItem.objects.filter(cart=session_cart)
 
+                    # Existing user cart items
+                    user_items = CartItem.objects.filter(user=user, is_active=True)
+                    existing_combos = {
+                        tuple(sorted(item.variations.values_list('id', flat=True))): item
+                        for item in user_items
+                    }
+
+                    for item in session_items:
+                        item_variation_ids = tuple(sorted(item.variations.values_list('id', flat=True)))
+                        if item_variation_ids in existing_combos:
+                            existing_item = existing_combos[item_variation_ids]
+                            existing_item.quantity += item.quantity
+                            existing_item.save()
+                            item.delete() 
+                        else:
+                            item.user = user
+                            item.cart = None
+                            item.save()
+
+                    session_cart.delete()
+
+                except Cart.DoesNotExist:
+                    pass
+
+                auth_login(request, user)
+
+                # Redirect back to the previous page, if exists
+                referer = request.META.get('HTTP_REFERER', 'dashboard') 
+                return redirect("dashboard")
+            else:
+                form.add_error(None, 'Invalid email or password')
     else:
         form = LoginForm()
 
-    context = {
-        'form': form,
-    }
-    return render(request, 'account/login.html', context)
+    return render(request, 'account/login.html', {'form': form})
 
 
 @login_required(login_url='login') 

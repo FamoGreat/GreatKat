@@ -1,0 +1,159 @@
+{% autoescape off %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Your Order Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f8f8;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 5px;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 30px;
+        }
+
+        .header img {
+            max-height: 40px;
+        }
+
+        .invoice-title {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .order-info, .address {
+            margin-bottom: 20px;
+        }
+
+        .order-info ul, .address ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .order-info li, .address li {
+            padding: 4px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f0f0f0;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .success {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            {% comment %} <img src="{{ domain }}/static/images/logo.png" alt="Company Logo"> {% endcomment %}
+            <h2 class="invoice-title success">Payment Successful</h2>
+            <p>Thank you for your order, {{ user.first_name }}!</p>
+        </div>
+
+        <div class="order-info">
+            <ul>
+                <li><strong>Order Number:</strong> {{ order.order_number }}</li>
+                <li><strong>Transaction ID:</strong> {{ order.payment }}</li>
+                <li><strong>Order Date:</strong> {{ order.created_at }}</li>
+                <li><strong>Status:</strong> PAID</li>
+            </ul>
+        </div>
+
+        <div class="address">
+            <ul>
+                <li><strong>Invoiced To:</strong></li>
+                <li>{{ order.full_name }}</li>
+                <li>{{ order.full_address }}</li>
+                <li>{{ order.city }}, {{ order.state }}</li>
+                <li>{{ order.country }}</li>
+            </ul>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    {% comment %} <th>Image</th> {% endcomment %}
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order_products %}
+                <tr>
+                    {% comment %} <td><img src="{{ item.product.images.url }}" alt="{{ item.product.product_name }}" style="max-height: 50px;"></td> {% endcomment %}
+                    <td>
+                        {{ item.product.product_name }}
+                        {% if item.color %}- Color: {{ item.color }}{% endif %}
+                        {% if item.size %}, Size: {{ item.size }}{% endif %}
+                    </td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ item.product_price|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="2" class="text-right">Sub Total:</th>
+                    <th>${{ sub_total|floatformat:2 }}</th>
+                </tr>
+                <tr>
+                    <th colspan="2" class="text-right">Tax:</th>
+                    <th>${{ order.tax }}</th>
+                </tr>
+                <tr>
+                    <th colspan="2" class="text-right">Grand Total:</th>
+                    <th>${{ order.order_total|floatformat:2 }}</th>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="footer">
+            <p>We appreciate your business!</p>
+            <p><a href="http://{{ domain }}">Visit our store again</a></p>
+        </div>
+    </div>
+</body>
+</html>
+
+
+{% endautoescape %}

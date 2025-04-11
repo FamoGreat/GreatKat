@@ -10,7 +10,7 @@ class CartAdmin(admin.ModelAdmin):
 
 
 class CartItemAdmin(admin.ModelAdmin):
-    list_display = ('product', 'cart', 'quantity', 'is_active')
+    list_display = ('user','product', 'cart', 'quantity', 'is_active')
     search_fields = ('product__name',)
     list_filter = ('is_active',)
     list_editable = ('quantity', 'is_active')
